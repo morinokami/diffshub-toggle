@@ -1,0 +1,37 @@
+:root {
+  color-scheme: light dark;
+}
+
+body {
+  font-family: system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+main {
+  max-width: 36rem;
+  padding: 1rem 1.5rem 1.5rem;
+}
+
+h1 {
+  font-size: 1.25rem;
+}
+
+h2 {
+  font-size: 1rem;
+  margin-top: 1.5rem;
+}
+
+kbd {
+  border: 1px solid color-mix(in srgb, currentcolor 40%, transparent);
+  border-radius: 4px;
+  font-family: ui-monospace, monospace;
+  font-size: 0.85em;
+  padding: 0.1em 0.4em;
+}
+
+button {
+  font: inherit;
+  padding: 0.4em 1em;
+}

@@ -1,0 +1,37 @@
+{
+  "manifest_version": 3,
+  "name": "GitHub ↔ DiffsHub Toggle",
+  "version": "0.1.0",
+  "description": "Toggle between matching GitHub and DiffsHub pages with one keyboard shortcut.",
+  "permissions": ["activeTab"],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_title": "Toggle GitHub ↔ DiffsHub",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png",
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    }
+  },
+  "commands": {
+    "toggle-github-diffshub": {
+      "suggested_key": {
+        "default": "Alt+Shift+D"
+      },
+      "description": "Toggle the current page between GitHub and DiffsHub"
+    }
+  },
+  "options_ui": {
+    "page": "options/index.html"
+  },
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  }
+}

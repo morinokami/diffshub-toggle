@@ -1,0 +1,38 @@
+# DiffsHub Toggle
+
+A Chrome extension (Manifest V3) that toggles the current tab between matching
+[GitHub](https://github.com/) and [DiffsHub](https://diffshub.com/) pages with a
+single keyboard shortcut.
+
+```text
+https://github.com/org/repo/pull/123
+        ⇅  Alt+Shift+D
+https://diffshub.com/org/repo/pull/123
+```
+
+Only the hostname is swapped — path, query parameters, and hash are preserved.
+The extension reads nothing from the page, requires only the `activeTab`
+permission, and collects no data.
+
+## Install (unpacked)
+
+1. Open `chrome://extensions/` and enable **Developer mode**.
+2. Click **Load unpacked** and select the `extension/` directory.
+
+## Usage
+
+- Press **Alt+Shift+D** (**Option+Shift+D** on macOS) on a GitHub or DiffsHub
+  page to jump to the matching page. Press it again to come back.
+- Clicking the toolbar icon does the same thing.
+- On any other site (or Chrome internal pages), nothing happens.
+- Change the shortcut anytime at `chrome://extensions/shortcuts`.
+
+Note: DiffsHub currently supports public GitHub diffs. For private
+repositories, the toggled page may not render — press the shortcut again to
+return to GitHub.
+
+## Privacy
+
+This extension does not collect, store, or transmit user data. It only changes
+the hostname of the active tab between `github.com` and `diffshub.com` when
+explicitly invoked by the user.
