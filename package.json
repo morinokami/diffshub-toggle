@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "description": "Chrome extension that toggles between matching GitHub and DiffsHub pages.",
+  "license": "MIT",
   "type": "module",
   "scripts": {
     "test": "node --test",
