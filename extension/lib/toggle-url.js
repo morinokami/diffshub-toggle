@@ -1,3 +1,24 @@
+/**
+ * Path patterns for pages that can be toggled between github.com and
+ * diffshub.com: pull requests (and their changes/files/commits tabs),
+ * commits, compares, and raw .diff/.patch views. Everything else (repo
+ * roots, issues, user pages, ...) has no DiffsHub counterpart.
+ *
+ * The strings are unanchored and must stay compatible with both JS RegExp
+ * and RE2: background.js embeds them into declarativeContent rules, so the
+ * toolbar icon state and toggleUrl() can never disagree.
+ */
+export const TOGGLEABLE_PATH_PATTERNS = Object.freeze([
+  "/[^/]+/[^/]+/pull/\\d+(/(changes|files|commits))?/?",
+  "/[^/]+/[^/]+/pull/\\d+\\.(diff|patch)",
+  "/[^/]+/[^/]+/commit/[^/]+/?",
+  "/[^/]+/[^/]+/compare/.+",
+]);
+
+const TOGGLEABLE_PATHS = TOGGLEABLE_PATH_PATTERNS.map(
+  (pattern) => new RegExp(`^${pattern}$`),
+);
+
 /** A pull request root path: /owner/repo/pull/123 (optional trailing slash). */
 const PR_ROOT = /^\/[^/]+\/[^/]+\/pull\/\d+\/?$/;
 
@@ -5,7 +26,8 @@ const PR_ROOT = /^\/[^/]+\/[^/]+\/pull\/\d+\/?$/;
  * Toggle a URL between github.com and diffshub.com.
  *
  * Only the hostname is swapped; path, query, and hash are preserved.
- * The destination is always HTTPS.
+ * The destination is always HTTPS. Paths without a DiffsHub counterpart
+ * (see TOGGLEABLE_PATH_PATTERNS) are not toggled in either direction.
  *
  * @param {string} input - The current page URL.
  * @param {{ returnToChanges?: boolean }} [settings] - When returnToChanges
@@ -14,7 +36,7 @@ const PR_ROOT = /^\/[^/]+\/[^/]+\/pull\/\d+\/?$/;
  *   Conversation tab. DiffsHub itself redirects /changes to the PR root,
  *   so the other direction needs no rewriting.
  * @returns {string | null} The toggled URL, or null when the URL is not
- *   a GitHub/DiffsHub page (or cannot be parsed).
+ *   a toggleable GitHub/DiffsHub page (or cannot be parsed).
  */
 export function toggleUrl(input, { returnToChanges = false } = {}) {
   let url;
@@ -25,6 +47,10 @@ export function toggleUrl(input, { returnToChanges = false } = {}) {
   }
 
   if (url.protocol !== "https:" && url.protocol !== "http:") {
+    return null;
+  }
+
+  if (!TOGGLEABLE_PATHS.some((pattern) => pattern.test(url.pathname))) {
     return null;
   }
 

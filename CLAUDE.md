@@ -22,10 +22,15 @@ Run scripts with `nub run <script>`:
 - Modules under `extension/lib/` (`toggle-url.js`, `settings.js`) are
   imported by both the extension and the Node tests. Keep them pure: no
   `chrome.*` APIs, no browser-only globals.
-- The extension must stay at the `activeTab` + `storage` permissions and
-  must never collect or transmit data — the README's privacy statement
-  depends on this. Don't add further permissions, host access, or content
-  scripts without being asked.
+- The extension must stay at the `activeTab` + `declarativeContent` +
+  `storage` permissions and must never collect or transmit data — the
+  README's privacy statement depends on this. Don't add further
+  permissions, host access, or content scripts without being asked.
+- Toggleable paths are defined once as `TOGGLEABLE_PATH_PATTERNS` in
+  `extension/lib/toggle-url.js` and shared by `toggleUrl()` and the
+  declarativeContent icon rules in `background.js`. The strings must stay
+  valid as both JS RegExp and RE2 — edit only that list so the icon state
+  and toggle behavior never disagree.
 - User settings live in `chrome.storage.sync`. Defaults for every setting
   go in `extension/lib/settings.js` (`DEFAULT_SETTINGS`); read them with
   `chrome.storage.sync.get(DEFAULT_SETTINGS)` so missing keys fall back
