@@ -4,6 +4,12 @@
 // arrows — green pointing right (GitHub -> DiffsHub), red pointing left
 // (DiffsHub -> GitHub).
 //
+// Also emits grayed-out variants (icon-gray-*.png) used as the action's
+// default icon; declarativeContent swaps in the colored icon on pages
+// that can be toggled. In the gray variant both arrows share one gray
+// tone, and the top arrow is drawn as an outline so the two arrows stay
+// distinguishable without color contrast.
+//
 // Usage: node scripts/generate-icons.js
 
 import { deflateSync } from "node:zlib";
@@ -22,6 +28,16 @@ const OUT_DIR = join(
 const BACKGROUND = [36, 41, 47, 255]; // GitHub dark gray
 const GREEN = [63, 185, 80, 255]; // diff addition green
 const RED = [248, 81, 73, 255]; // diff deletion red
+
+// Desaturated and translucent, so the inactive icon reads as "off" on
+// both light and dark toolbars.
+function grayscale([r, g, b, a]) {
+  const lum = Math.round(0.2126 * r + 0.7152 * g + 0.0722 * b);
+  return [lum, lum, lum, Math.round(a * 0.5)];
+}
+
+const GRAY_BACKGROUND = grayscale(BACKGROUND);
+const GRAY_ARROW = grayscale(RED);
 
 // Shape parameters in unit coordinates (0..1).
 const CORNER_RADIUS = 0.22;
@@ -57,6 +73,24 @@ function insideArrow(x, y, centerY, tail, tip) {
   return inShaft || inHead;
 }
 
+// A point is on the arrow's outline when it is inside the arrow but a
+// probe ring of the stroke width around it escapes the shape.
+function insideArrowOutline(x, y, centerY, tail, tip, width) {
+  if (!insideArrow(x, y, centerY, tail, tip)) {
+    return false;
+  }
+  const probes = 8;
+  for (let i = 0; i < probes; i++) {
+    const angle = (2 * Math.PI * i) / probes;
+    const px = x + width * Math.cos(angle);
+    const py = y + width * Math.sin(angle);
+    if (!insideArrow(px, py, centerY, tail, tip)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 function colorAt(x, y) {
   if (!insideRoundedSquare(x, y)) {
     return null;
@@ -70,7 +104,22 @@ function colorAt(x, y) {
   return BACKGROUND;
 }
 
-function renderIcon(size) {
+// Gray variant: top arrow as an outline (interior shows the background),
+// bottom arrow solid, both in the same gray.
+function grayAt(x, y, outlineWidth) {
+  if (!insideRoundedSquare(x, y)) {
+    return null;
+  }
+  if (insideArrowOutline(x, y, TOP_Y, ARROW_TAIL, ARROW_TIP, outlineWidth)) {
+    return GRAY_ARROW;
+  }
+  if (insideArrow(x, y, BOTTOM_Y, ARROW_TIP, ARROW_TAIL)) {
+    return GRAY_ARROW;
+  }
+  return GRAY_BACKGROUND;
+}
+
+function renderIcon(size, pick = colorAt) {
   const rgba = new Uint8Array(size * size * 4);
   const samples = 4; // 4x4 supersampling for antialiasing
 
@@ -84,7 +133,7 @@ function renderIcon(size) {
         for (let sx = 0; sx < samples; sx++) {
           const x = (px + (sx + 0.5) / samples) / size;
           const y = (py + (sy + 0.5) / samples) / size;
-          const color = colorAt(x, y);
+          const color = pick(x, y);
           if (color) {
             r += color[0];
             g += color[1];
@@ -161,7 +210,20 @@ function encodePng(size, rgba) {
 
 mkdirSync(OUT_DIR, { recursive: true });
 for (const size of SIZES) {
-  const file = join(OUT_DIR, `icon-${size}.png`);
-  writeFileSync(file, encodePng(size, renderIcon(size)));
-  console.log(`wrote ${file}`);
+  const colored = join(OUT_DIR, `icon-${size}.png`);
+  writeFileSync(colored, encodePng(size, renderIcon(size)));
+  console.log(`wrote ${colored}`);
+
+  // Keep the outline at least ~1.4 physical pixels so it survives the
+  // smallest sizes.
+  const outlineWidth = Math.max(1.4 / size, 0.04);
+  const gray = join(OUT_DIR, `icon-gray-${size}.png`);
+  writeFileSync(
+    gray,
+    encodePng(
+      size,
+      renderIcon(size, (x, y) => grayAt(x, y, outlineWidth)),
+    ),
+  );
+  console.log(`wrote ${gray}`);
 }

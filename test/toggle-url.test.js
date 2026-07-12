@@ -70,9 +70,38 @@ test("www.github.com is normalized to diffshub.com", () => {
 
 test("hostname matching is case-insensitive", () => {
   assert.equal(
-    toggleUrl("https://GitHub.com/org/repo"),
-    "https://diffshub.com/org/repo",
+    toggleUrl("https://GitHub.com/org/repo/pull/123"),
+    "https://diffshub.com/org/repo/pull/123",
   );
+});
+
+test("PR tab paths stay toggleable", () => {
+  assert.equal(
+    toggleUrl("https://github.com/org/repo/pull/123/commits"),
+    "https://diffshub.com/org/repo/pull/123/commits",
+  );
+  assert.equal(
+    toggleUrl("https://github.com/org/repo/pull/123/files"),
+    "https://diffshub.com/org/repo/pull/123/files",
+  );
+  assert.equal(
+    toggleUrl("https://github.com/org/repo/pull/123/changes"),
+    "https://diffshub.com/org/repo/pull/123/changes",
+  );
+});
+
+test("non-diff GitHub paths return null", () => {
+  assert.equal(toggleUrl("https://github.com/"), null);
+  assert.equal(toggleUrl("https://github.com/org"), null);
+  assert.equal(toggleUrl("https://github.com/org/repo"), null);
+  assert.equal(toggleUrl("https://github.com/org/repo/issues/123"), null);
+  assert.equal(toggleUrl("https://github.com/org/repo/pulls"), null);
+  assert.equal(toggleUrl("https://github.com/org/repo/pull/123/checks"), null);
+});
+
+test("non-diff DiffsHub paths return null", () => {
+  assert.equal(toggleUrl("https://diffshub.com/"), null);
+  assert.equal(toggleUrl("https://diffshub.com/org/repo"), null);
 });
 
 test("http is upgraded to https", () => {
