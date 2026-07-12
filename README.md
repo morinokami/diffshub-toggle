@@ -45,11 +45,11 @@ return to GitHub.
 
 ## Privacy
 
-This extension does not collect or transmit user data. Your settings are
-stored only in your browser via Chrome's extension storage (and synced between
-your devices by Chrome if you enable browser sync); they are never sent to the
-developer or any third party. The toolbar icon's active/grayed state is driven
-by Chrome's `declarativeContent` API, which matches URLs inside the browser
-itself — the extension never reads which pages you visit. The extension only
-changes the hostname of the active tab between `github.com` and `diffshub.com`
-when explicitly invoked by the user.
+This extension does not collect user data or send it to the developer. Your
+settings are stored with Chrome's extension storage and may be synced between
+your devices by Chrome when browser sync is enabled. The toolbar icon's
+active/grayed state is driven by Chrome's `declarativeContent` API, which
+matches URLs inside the browser without exposing them to the extension. The
+extension does not monitor your browsing; only when you explicitly invoke it
+does it read the active tab's URL to replace the hostname between `github.com`
+and `diffshub.com`.
