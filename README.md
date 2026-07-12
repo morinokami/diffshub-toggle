@@ -17,7 +17,12 @@ The extension reads nothing from the page, requires only the `activeTab`,
 `contextMenus`, `declarativeContent`, and `storage` permissions, and collects
 no data.
 
-## Install (unpacked)
+## Install
+
+Install from the
+[Chrome Web Store](https://chromewebstore.google.com/detail/diffshub-toggle/paceechpdeogdfepgabkoecoogfgbcob).
+
+### From source (unpacked)
 
 1. Open `chrome://extensions/` and enable **Developer mode**.
 2. Click **Load unpacked** and select the `extension/` directory.
