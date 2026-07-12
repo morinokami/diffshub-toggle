@@ -11,8 +11,8 @@ https://diffshub.com/org/repo/pull/123
 ```
 
 Only the hostname is swapped — path, query parameters, and hash are preserved.
-The extension reads nothing from the page, requires only the `activeTab`
-permission, and collects no data.
+The extension reads nothing from the page, requires only the `activeTab` and
+`storage` permissions, and collects no data.
 
 ## Install (unpacked)
 
@@ -24,6 +24,9 @@ permission, and collects no data.
 - Press **Alt+Shift+D** (**Option+Shift+D** on macOS) on a GitHub or DiffsHub
   page to jump to the matching page. Press it again to come back.
 - Clicking the toolbar icon does the same thing.
+- By default the current tab navigates in place. To open the matching page in
+  a new tab instead, enable **Open the matching page in a new tab** on the
+  extension's options page.
 - On any other site (or Chrome internal pages), nothing happens.
 - Change the shortcut anytime at `chrome://extensions/shortcuts`.
 
@@ -33,6 +36,9 @@ return to GitHub.
 
 ## Privacy
 
-This extension does not collect, store, or transmit user data. It only changes
-the hostname of the active tab between `github.com` and `diffshub.com` when
-explicitly invoked by the user.
+This extension does not collect or transmit user data. Your settings are
+stored only in your browser via Chrome's extension storage (and synced between
+your devices by Chrome if you enable browser sync); they are never sent to the
+developer or any third party. The extension only changes the hostname of the
+active tab between `github.com` and `diffshub.com` when explicitly invoked by
+the user.

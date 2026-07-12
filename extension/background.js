@@ -1,7 +1,9 @@
+import { DEFAULT_SETTINGS } from "./lib/settings.js";
 import { toggleUrl } from "./lib/toggle-url.js";
 
 /**
- * Navigate the given tab to its GitHub/DiffsHub counterpart.
+ * Send the given tab to its GitHub/DiffsHub counterpart — in place, or in
+ * a new tab next to it when the openInNewTab setting is enabled.
  *
  * Silently does nothing when the tab has no toggleable URL
  * (non-target sites, chrome:// pages, etc.).
@@ -18,8 +20,18 @@ async function toggleTab(tab) {
     return;
   }
 
+  const { openInNewTab } = await chrome.storage.sync.get(DEFAULT_SETTINGS);
+
   try {
-    await chrome.tabs.update(tab.id, { url: nextUrl });
+    if (openInNewTab) {
+      await chrome.tabs.create({
+        url: nextUrl,
+        index: tab.index + 1,
+        openerTabId: tab.id,
+      });
+    } else {
+      await chrome.tabs.update(tab.id, { url: nextUrl });
+    }
   } catch (error) {
     // The tab may have been closed while handling the command.
     console.debug("GitHub <-> DiffsHub toggle failed:", error);
