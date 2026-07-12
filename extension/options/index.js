@@ -6,11 +6,18 @@ document.getElementById("open-shortcuts").addEventListener("click", () => {
   chrome.tabs.create({ url: "chrome://extensions/shortcuts" });
 });
 
-const openInNewTab = document.getElementById("open-in-new-tab");
+const checkboxes = {
+  openInNewTab: document.getElementById("open-in-new-tab"),
+  returnToChanges: document.getElementById("return-to-changes"),
+};
 
-openInNewTab.addEventListener("change", () => {
-  void chrome.storage.sync.set({ openInNewTab: openInNewTab.checked });
-});
+for (const [key, checkbox] of Object.entries(checkboxes)) {
+  checkbox.addEventListener("change", () => {
+    void chrome.storage.sync.set({ [key]: checkbox.checked });
+  });
+}
 
 const settings = await chrome.storage.sync.get(DEFAULT_SETTINGS);
-openInNewTab.checked = settings.openInNewTab;
+for (const [key, checkbox] of Object.entries(checkboxes)) {
+  checkbox.checked = settings[key];
+}

@@ -7,4 +7,5 @@
  */
 export const DEFAULT_SETTINGS = Object.freeze({
   openInNewTab: false,
+  returnToChanges: false,
 });
