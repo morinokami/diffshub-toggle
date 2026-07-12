@@ -1,5 +1,9 @@
 import { DEFAULT_SETTINGS } from "./lib/settings.js";
-import { TOGGLEABLE_PATH_PATTERNS, toggleUrl } from "./lib/toggle-url.js";
+import {
+  TOGGLEABLE_PATH_GLOBS,
+  TOGGLEABLE_PATH_PATTERNS,
+  toggleUrl,
+} from "./lib/toggle-url.js";
 
 /**
  * Send the given tab to its GitHub/DiffsHub counterpart — in place, or in
@@ -38,6 +42,57 @@ async function toggleTab(tab) {
   }
 }
 
+// Context menu item for links pointing at toggleable github.com pages.
+// GitHub -> DiffsHub only: DiffsHub links barely occur in the wild, so the
+// reverse item earned no menu space. TOGGLEABLE_PATH_GLOBS approximates
+// TOGGLEABLE_PATH_PATTERNS as match patterns (regexes are not supported), so
+// a few near-miss links without a counterpart — e.g. a PR's /checks tab —
+// still show the item; clicking those is a no-op via toggleUrl(), the same
+// behavior as action clicks on non-toggleable pages. Chrome matches
+// targetUrlPatterns inside the browser — the extension only receives a link's
+// URL when the user picks the item.
+const OPEN_LINK_MENU_ITEM = Object.freeze({
+  id: "open-link-in-diffshub",
+  title: "Open Link in DiffsHub",
+  targetUrlPatterns: ["github.com", "www.github.com"].flatMap((host) =>
+    TOGGLEABLE_PATH_GLOBS.map((glob) => `*://${host}${glob}`),
+  ),
+});
+
+/**
+ * Open the DiffsHub counterpart of a right-clicked GitHub link.
+ *
+ * Always opens a new tab regardless of the openInNewTab setting: a link
+ * context menu item should never navigate the current page away. No other
+ * setting applies either — the menu only matches GitHub links, and
+ * returnToChanges only affects the DiffsHub -> GitHub direction.
+ *
+ * Silently does nothing when the link has no toggleable URL.
+ *
+ * @param {chrome.contextMenus.OnClickData} info
+ * @param {chrome.tabs.Tab | undefined} tab
+ */
+async function openLinkCounterpart(info, tab) {
+  if (!info.linkUrl) {
+    return;
+  }
+
+  const nextUrl = toggleUrl(info.linkUrl);
+  if (!nextUrl) {
+    return;
+  }
+
+  try {
+    await chrome.tabs.create({
+      url: nextUrl,
+      ...(tab?.id ? { index: tab.index + 1, openerTabId: tab.id } : {}),
+    });
+  } catch (error) {
+    // The originating tab may have been closed while handling the click.
+    console.debug("GitHub <-> DiffsHub link open failed:", error);
+  }
+}
+
 /**
  * Load a packaged icon as ImageData for a declarativeContent SetIcon
  * action, which does not accept paths in MV3 (crbug.com/893087).
@@ -70,6 +125,10 @@ chrome.runtime.onInstalled.addListener(async () => {
     16: await loadIconImageData(16),
     32: await loadIconImageData(32),
   };
+  chrome.contextMenus.removeAll(() => {
+    chrome.contextMenus.create({ ...OPEN_LINK_MENU_ITEM, contexts: ["link"] });
+  });
+
   chrome.declarativeContent.onPageChanged.removeRules(undefined, () => {
     chrome.declarativeContent.onPageChanged.addRules([
       {
@@ -96,4 +155,11 @@ chrome.commands.onCommand.addListener((command, tab) => {
 
 chrome.action.onClicked.addListener((tab) => {
   void toggleTab(tab);
+});
+
+chrome.contextMenus.onClicked.addListener((info, tab) => {
+  if (info.menuItemId !== OPEN_LINK_MENU_ITEM.id) {
+    return;
+  }
+  void openLinkCounterpart(info, tab);
 });

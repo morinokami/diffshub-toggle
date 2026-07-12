@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { toggleUrl } from "../extension/lib/toggle-url.js";
+import {
+  TOGGLEABLE_PATH_GLOBS,
+  toggleUrl,
+} from "../extension/lib/toggle-url.js";
 
 test("GitHub PR URL -> DiffsHub", () => {
   assert.equal(
@@ -182,4 +185,63 @@ test("returnToChanges: GitHub -> DiffsHub direction is unaffected", () => {
     }),
     "https://diffshub.com/org/repo/pull/123/changes",
   );
+});
+
+// Chrome match-pattern path semantics: "*" matches zero or more characters,
+// everything else is literal.
+function matchesAnyGlob(path) {
+  return TOGGLEABLE_PATH_GLOBS.some((glob) => {
+    const pattern = glob
+      .split("*")
+      .map((part) => part.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+      .join(".*");
+    return new RegExp(`^${pattern}$`).test(path);
+  });
+}
+
+test("globs are a superset: every toggleable path matches a glob", () => {
+  const toggleablePaths = [
+    "/org/repo/pull/123",
+    "/org/repo/pull/123/",
+    "/org/repo/pull/123/changes",
+    "/org/repo/pull/123/files",
+    "/org/repo/pull/123/commits",
+    "/org/repo/pull/123.diff",
+    "/org/repo/pull/123.patch",
+    "/org/repo/commit/abcdef",
+    "/org/repo/commit/abcdef/",
+    "/org/repo/compare/main...feature",
+  ];
+  for (const path of toggleablePaths) {
+    assert.notEqual(
+      toggleUrl(`https://github.com${path}`),
+      null,
+      `sample is not toggleable: ${path}`,
+    );
+    assert.ok(matchesAnyGlob(path), `toggleable path matches no glob: ${path}`);
+  }
+});
+
+test("globs hide the context menu on clearly non-toggleable paths", () => {
+  const hiddenPaths = [
+    "/",
+    "/org",
+    "/org/repo",
+    "/org/repo/issues/123",
+    "/org/repo/pulls",
+    "/org/repo/tree/main",
+  ];
+  for (const path of hiddenPaths) {
+    assert.equal(toggleUrl(`https://github.com${path}`), null, path);
+    assert.ok(
+      !matchesAnyGlob(path),
+      `path unexpectedly matches a glob: ${path}`,
+    );
+  }
+});
+
+test("globs stay a superset, not exact: near-miss paths match but do not toggle", () => {
+  const path = "/org/repo/pull/123/checks";
+  assert.equal(toggleUrl(`https://github.com${path}`), null);
+  assert.ok(matchesAnyGlob(path));
 });
