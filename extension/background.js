@@ -15,15 +15,15 @@ async function toggleTab(tab) {
     return;
   }
 
-  const nextUrl = toggleUrl(tab.url);
+  const settings = await chrome.storage.sync.get(DEFAULT_SETTINGS);
+
+  const nextUrl = toggleUrl(tab.url, settings);
   if (!nextUrl) {
     return;
   }
 
-  const { openInNewTab } = await chrome.storage.sync.get(DEFAULT_SETTINGS);
-
   try {
-    if (openInNewTab) {
+    if (settings.openInNewTab) {
       await chrome.tabs.create({
         url: nextUrl,
         index: tab.index + 1,

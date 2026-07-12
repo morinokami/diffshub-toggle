@@ -4,7 +4,10 @@ import { test } from "node:test";
 import { DEFAULT_SETTINGS } from "../extension/lib/settings.js";
 
 test("every setting has a default", () => {
-  assert.deepEqual(DEFAULT_SETTINGS, { openInNewTab: false });
+  assert.deepEqual(DEFAULT_SETTINGS, {
+    openInNewTab: false,
+    returnToChanges: false,
+  });
 });
 
 test("defaults are frozen against accidental mutation", () => {

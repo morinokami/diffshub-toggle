@@ -10,7 +10,9 @@ https://github.com/org/repo/pull/123
 https://diffshub.com/org/repo/pull/123
 ```
 
-Only the hostname is swapped — path, query parameters, and hash are preserved.
+Only the hostname is swapped — path, query parameters, and hash are preserved
+(optionally, returning to a GitHub pull request can land on its **Files
+changed** tab, `/changes`).
 The extension reads nothing from the page, requires only the `activeTab` and
 `storage` permissions, and collects no data.
 
@@ -27,6 +29,9 @@ The extension reads nothing from the page, requires only the `activeTab` and
 - By default the current tab navigates in place. To open the matching page in
   a new tab instead, enable **Open the matching page in a new tab** on the
   extension's options page.
+- Returning from DiffsHub to a GitHub pull request lands on the Conversation
+  tab. To land on the **Files changed** tab (`/changes`) instead, enable the
+  corresponding option on the options page.
 - On any other site (or Chrome internal pages), nothing happens.
 - Change the shortcut anytime at `chrome://extensions/shortcuts`.
 

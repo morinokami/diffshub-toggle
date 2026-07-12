@@ -97,3 +97,60 @@ test("invalid URLs return null", () => {
   assert.equal(toggleUrl("not a url"), null);
   assert.equal(toggleUrl(""), null);
 });
+
+test("returnToChanges: DiffsHub PR root -> GitHub Files changed tab", () => {
+  assert.equal(
+    toggleUrl("https://diffshub.com/org/repo/pull/123", {
+      returnToChanges: true,
+    }),
+    "https://github.com/org/repo/pull/123/changes",
+  );
+});
+
+test("returnToChanges: trailing slash is handled", () => {
+  assert.equal(
+    toggleUrl("https://diffshub.com/org/repo/pull/123/", {
+      returnToChanges: true,
+    }),
+    "https://github.com/org/repo/pull/123/changes",
+  );
+});
+
+test("returnToChanges: query and hash come after /changes", () => {
+  assert.equal(
+    toggleUrl("https://diffshub.com/org/repo/pull/123?w=1#top", {
+      returnToChanges: true,
+    }),
+    "https://github.com/org/repo/pull/123/changes?w=1#top",
+  );
+});
+
+test("returnToChanges: non-PR-root DiffsHub URLs are untouched", () => {
+  assert.equal(
+    toggleUrl("https://diffshub.com/org/repo/commit/abcdef", {
+      returnToChanges: true,
+    }),
+    "https://github.com/org/repo/commit/abcdef",
+  );
+  assert.equal(
+    toggleUrl("https://diffshub.com/org/repo/pull/123/commits", {
+      returnToChanges: true,
+    }),
+    "https://github.com/org/repo/pull/123/commits",
+  );
+  assert.equal(
+    toggleUrl("https://diffshub.com/org/repo/pull/123.diff", {
+      returnToChanges: true,
+    }),
+    "https://github.com/org/repo/pull/123.diff",
+  );
+});
+
+test("returnToChanges: GitHub -> DiffsHub direction is unaffected", () => {
+  assert.equal(
+    toggleUrl("https://github.com/org/repo/pull/123/changes", {
+      returnToChanges: true,
+    }),
+    "https://diffshub.com/org/repo/pull/123/changes",
+  );
+});
