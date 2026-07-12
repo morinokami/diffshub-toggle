@@ -11,8 +11,8 @@
     "lint:fix": "oxlint --fix",
     "fmt": "oxfmt",
     "fmt:check": "oxfmt --check",
-    "icons": "node scripts/generate-icons.js",
-    "build": "sh scripts/build.sh"
+    "build": "sh scripts/build.sh",
+    "build:icons": "node scripts/generate-icons.js"
   },
   "devDependencies": {
     "oxfmt": "0.58.0",
