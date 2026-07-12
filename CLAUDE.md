@@ -19,12 +19,17 @@ Run scripts with `nub run <script>`:
 
 - Everything under `extension/` ships verbatim in the store ZIP — never put
   dev-only files, tests, or docs there.
-- `extension/lib/toggle-url.js` is imported by both the service worker and
-  the Node tests. Keep it a pure module: no `chrome.*` APIs, no
-  browser-only globals.
-- The extension must stay at the single `activeTab` permission and collect
-  no data — the README's privacy statement depends on this. Don't add
-  permissions, host access, or content scripts without being asked.
+- Modules under `extension/lib/` (`toggle-url.js`, `settings.js`) are
+  imported by both the extension and the Node tests. Keep them pure: no
+  `chrome.*` APIs, no browser-only globals.
+- The extension must stay at the `activeTab` + `storage` permissions and
+  must never collect or transmit data — the README's privacy statement
+  depends on this. Don't add further permissions, host access, or content
+  scripts without being asked.
+- User settings live in `chrome.storage.sync`. Defaults for every setting
+  go in `extension/lib/settings.js` (`DEFAULT_SETTINGS`); read them with
+  `chrome.storage.sync.get(DEFAULT_SETTINGS)` so missing keys fall back
+  automatically — no onInstalled initialization or migrations.
 
 # Workflow
 

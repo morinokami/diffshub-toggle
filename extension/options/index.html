@@ -29,6 +29,14 @@
         </button>
       </p>
 
+      <h2>Settings</h2>
+      <p>
+        <label>
+          <input type="checkbox" id="open-in-new-tab" />
+          Open the matching page in a new tab
+        </label>
+      </p>
+
       <h2>Notes</h2>
       <ul>
         <li>DiffsHub currently supports public GitHub diffs.</li>
@@ -41,11 +49,13 @@
 
       <h2>Privacy</h2>
       <p>
-        This extension does not collect, store, or transmit any user data. It
-        only changes the hostname of the active tab between github.com and
-        diffshub.com when explicitly invoked by you.
+        This extension does not collect or transmit any user data. Your settings
+        are stored only in your browser (and synced between your devices by
+        Chrome if you enable browser sync). It only changes the hostname of the
+        active tab between github.com and diffshub.com when explicitly invoked
+        by you.
       </p>
     </main>
-    <script src="index.js"></script>
+    <script type="module" src="index.js"></script>
   </body>
 </html>
