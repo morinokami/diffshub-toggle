@@ -3,7 +3,7 @@
   "name": "DiffsHub Toggle",
   "version": "0.2.0",
   "description": "Toggle between matching GitHub and DiffsHub pages with one keyboard shortcut.",
-  "permissions": ["activeTab", "declarativeContent", "storage"],
+  "permissions": ["activeTab", "contextMenus", "declarativeContent", "storage"],
   "background": {
     "service_worker": "background.js",
     "type": "module"

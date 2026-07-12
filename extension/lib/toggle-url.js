@@ -15,6 +15,24 @@ export const TOGGLEABLE_PATH_PATTERNS = Object.freeze([
   "/[^/]+/[^/]+/compare/.+",
 ]);
 
+/**
+ * Coarse Chrome match-pattern globs (path part only) covering every path in
+ * TOGGLEABLE_PATH_PATTERNS, for APIs that take match patterns instead of
+ * regexes — background.js builds the contextMenus targetUrlPatterns from
+ * them.
+ *
+ * Match patterns cannot express the regexes exactly, so these are a strict
+ * superset: every toggleable path matches a glob, but a few non-toggleable
+ * paths (e.g. /org/repo/pull/123/checks) match too — callers must still
+ * validate through toggleUrl(). Keep this list in sync when editing
+ * TOGGLEABLE_PATH_PATTERNS; test/toggle-url.test.js enforces the superset.
+ */
+export const TOGGLEABLE_PATH_GLOBS = Object.freeze([
+  "/*/*/pull/*",
+  "/*/*/commit/*",
+  "/*/*/compare/*",
+]);
+
 const TOGGLEABLE_PATHS = TOGGLEABLE_PATH_PATTERNS.map(
   (pattern) => new RegExp(`^${pattern}$`),
 );
